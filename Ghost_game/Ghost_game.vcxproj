@@ -149,6 +149,7 @@
     <ClInclude Include="base\console.h" />
     <ClInclude Include="base\enum.h" />
     <ClInclude Include="base\Filemanager.h" />
+    <ClInclude Include="base\log.h" />
     <ClInclude Include="base\mem.h" />
     <ClInclude Include="base\Resource.h" />
     <ClInclude Include="base\String.h" />

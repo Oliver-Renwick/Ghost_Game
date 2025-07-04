@@ -80,6 +80,9 @@
     <ClInclude Include="Renderer\Gpudevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="base\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Scene\LevelData\Level_1.json" />

@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include "base/Array.h"
+#include "base/log.h"
 #include "base/console.h"
 #include "base/Filemanager.h"
 #include "base/Resource.h"
@@ -11,6 +12,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdsh
 {
 	setUp_Console();
 
+	
 	StackAllocator scratch_allocator;
 	scratch_allocator.init(Mega(4));
 
