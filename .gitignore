@@ -1,0 +1,19 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.VC.db
+
+# Build artifacts
+*.exe
+*.dll
+*.lib
+*.pdb
+*.obj
+*.idb
+*.ilk
+*.ipch
+*.log
+*exe
+Dependencies/
+x64/

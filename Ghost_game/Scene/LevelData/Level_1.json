@@ -1,0 +1,48 @@
+{
+  "name": "Level 1",
+
+  "skybox": [
+    "Summer Sky",
+    "Winter Sky",
+    "Space Sky"
+  ],
+
+  "static_objects": [
+    {
+      "name": "platform",
+      "translate": [ 0, 0, 0 ],
+      "rotation": [ 0, 0, 0 ],
+      "scale": [ 1, 1, 1 ],
+
+      "object_path": ""
+    },
+    {
+      "name": "Box",
+      "translate": [ 0, 1, 0 ],
+      "rotation": [ 0, 0, 0 ],
+      "scale": [ 1, 1, 1 ],
+
+      "object_path": ""
+    }
+  ],
+
+  "npc": [
+    {
+      "moving_platform": [
+        {
+          "name": "moving trap",
+          "count": 5
+        },
+        {
+          "name": "Health bar",
+          "count": 10
+        }
+      ],
+
+      "enemy_type": [
+        "Cone", "Sphere", "cylinder"
+      ] 
+    }
+
+  ]
+}

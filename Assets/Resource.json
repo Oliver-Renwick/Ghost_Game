@@ -1,0 +1,22 @@
+{
+    "Model":[
+        "bot.gltf",
+        "Platform.gltf",
+        "cube.gltf"
+    ],
+
+    "Texture":[
+        "grass.ktx",
+        "Mud.ktx"
+    ],
+
+    "Sound":[
+        "Drop.sound",
+        "Attack.sound"
+    ],
+
+    "Animation":[
+        "splines.anim",
+        "idkhowanimationworks.anim"
+    ]
+}
