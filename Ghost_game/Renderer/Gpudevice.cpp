@@ -29,11 +29,26 @@ namespace g_graphics
 		return create_info;
 	}
 
+	bool GpuDevice::get_family_queue(VkPhysicalDevice physicalDevice)
+	{
+		uint32_t queuepropsCount;
+		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queuepropsCount, nullptr);
+		G_INFO("count of queue props ", queuepropsCount);
+		VkQueueFamilyProperties* queue_family_properties = (VkQueueFamilyProperties*)
+			m_tempallocator->allocate(sizeof(VkQueueFamilyProperties) * queuepropsCount, alignof(VkQueueFamilyProperties));
+		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queuepropsCount, queue_family_properties);
+
+
+
+
+	}
+
+
 	void GpuDevice::Init(DeviceCreation* device_creation)
 	{
 		m_tempallocator = device_creation->m_tempallocator;
 		m_allocator		= device_creation->m_allocator;
-		m_stringbuffer.init(m_allocator, 1024 * 1024);
+		//m_stringbuffer.init(m_allocator, 1024 * 1024);
 
 
 		//Instance Creation
@@ -54,7 +69,7 @@ namespace g_graphics
 		
 		instance_info.pNext = &debug_create_info;
 
-		VkResult res = vkCreateInstance(&instance_info, nullptr, &m_instance);
+		VK_CHECK_RESULT(vkCreateInstance(&instance_info, nullptr, &m_instance));
 
 
 		size_t temp_allocmarker = m_tempallocator->get_marker();
@@ -85,6 +100,44 @@ namespace g_graphics
 				vkCreateDebugUtilsMessengerEXT(m_instance, &debug_messenger_create_info, nullptr, &vulkan_debug_utils_messenger);
 			}
 		}
+
+		//Finiding physical device
+		{
+			uint32_t physicalDevice_count;
+			vkEnumeratePhysicalDevices(m_instance, &physicalDevice_count, nullptr);
+			VkPhysicalDevice* physicalDevices = (VkPhysicalDevice*)m_tempallocator->allocate(sizeof(VkPhysicalDevice) * physicalDevice_count, alignof(VkPhysicalDevice));
+			vkEnumeratePhysicalDevices(m_instance, &physicalDevice_count, physicalDevices);
+
+
+			for (int i = 0; i < physicalDevice_count; i++)
+			{
+				VkPhysicalDevice physicaldev = physicalDevices[i];
+				vkGetPhysicalDeviceProperties(physicaldev, &physical_device_properties);
+
+
+				if (physical_device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+					if (get_family_queue(physicaldev))
+					{
+
+					}
+
+					continue;
+				}
+
+				if (physical_device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
+				{
+					if (get_family_queue(physicaldev))
+					{
+
+					}
+
+					continue;
+				}
+
+			}
+
+		}
+
 
 	}
 }

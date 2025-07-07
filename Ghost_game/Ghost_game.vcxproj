@@ -105,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);PROJECT_PATH="C:\\Users\\ASUS\\Desktop\\Ghost_Game\\Ghost_game"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Vulkan\Include;$(SolutionDir)Dependencies\tinygltf;$(SolutionDir)Dependencies\ktx\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\ktx\other_include;$(SolutionDir)Dependencies\imgui;$(SolutionDir)Ghost_game;$(SolutionDir)Dependencies\enkiTS\src;$(SolutionDir)Dependencies\JSON;$(SolutionDir)Dependencies\VMA</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -122,6 +123,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);PROJECT_PATH="C:\\Users\\ASUS\\Desktop\\Ghost_Game\\Ghost_game"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Vulkan\Include;$(SolutionDir)Dependencies\tinygltf;$(SolutionDir)Dependencies\ktx\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\ktx\other_include;$(SolutionDir)Dependencies\imgui;$(SolutionDir)Ghost_game;$(SolutionDir)Dependencies\enkiTS\src;$(SolutionDir)Dependencies\JSON;$(SolutionDir)Dependencies\VMA</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

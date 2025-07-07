@@ -29,6 +29,15 @@
     } while (0)
 
 
+#define G_INFO(...) \
+    do { \
+        std::cout << "\033[94m"; \
+        std::cout << "[INFO] " << "\n"; \
+        std::cout << "Message: ";\
+        ([](const auto&... args) { ((std::cout << args), ...); })(__VA_ARGS__); \
+        std::cout << std::endl; \
+        std::cout << "\033[0m"; \
+    } while(0)
 
 #define VK_CHECK_RESULT(f)																				\
 {																										\

@@ -18,14 +18,17 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdsh
 
 	size_t marker = scratch_allocator.get_marker();
 
-	ResourceManager resource_manager;
-	resource_manager.Init(&scratch_allocator);
+	//Graphics Test
+	DeviceCreation dc;
+	dc.height = 500;
+	dc.width = 500;
+	dc.m_tempallocator = &scratch_allocator;
+	dc.num_threads = 8;
+
+	GpuDevice gpu;
+	gpu.Init(&dc);
 
 
-
-	scratch_allocator.deallocate(marker);
-
-	resource_manager.shutdown();
 	scratch_allocator.shutdown();
 
 	system("pause");

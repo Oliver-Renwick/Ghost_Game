@@ -4,6 +4,7 @@
 #include "base/mem.h"
 #include "base/String.h"
 #include "base/Array.h"
+#include "base/log.h"
 
 namespace g_graphics
 {
@@ -37,13 +38,15 @@ namespace g_graphics
 		StackAllocator*    m_tempallocator;
 		Allocator*		   m_allocator;
 		VkInstance		   m_instance;
+		VkPhysicalDevice   m_physicalDevice;
 		String_Buffer	   m_stringbuffer;
 
 		bool debug_extension_present = false;
 
 		VkDebugUtilsMessengerEXT vulkan_debug_utils_messenger;
-
+		VkPhysicalDeviceProperties physical_device_properties;
 		void Init(DeviceCreation* device_creation);
+		bool get_family_queue(VkPhysicalDevice physicalDevice);
 	};
 
 	VkDebugUtilsMessengerCreateInfoEXT create_debug_utils_messenger_info();
