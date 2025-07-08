@@ -38,11 +38,12 @@ namespace g_graphics
 			m_tempallocator->allocate(sizeof(VkQueueFamilyProperties) * queuepropsCount, alignof(VkQueueFamilyProperties));
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queuepropsCount, queue_family_properties);
 
+		uint32_t queue_count = 0;
 		VkBool32 is_Supported = VK_FALSE;
 		for (uint32_t i = 0; i < queuepropsCount; i++)
 		{
 			VkQueueFamilyProperties queue_prop = queue_family_properties[i];
-
+			
 			if (queue_prop.queueCount > 0 && queue_prop.queueFlags & (VK_QUEUE_COMPUTE_BIT | VK_QUEUE_GRAPHICS_BIT) )
 			{
 				vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, m_surface, &is_Supported);
@@ -53,7 +54,6 @@ namespace g_graphics
 				}
 			}
 		}
-
 		return is_Supported;
 
 	}
@@ -176,7 +176,90 @@ namespace g_graphics
 
 		m_tempallocator->deallocate(temp_allocmarker);
 
+		{
+			temp_allocmarker = m_tempallocator->get_marker();
+
+			uint32_t extension_count = 0;
+			vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extension_count, nullptr);
+			VkExtensionProperties* extensions = (VkExtensionProperties*)m_tempallocator->allocate(sizeof(VkExtensionProperties) * extension_count, alignof(VkExtensionProperties));
+			vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extension_count, extensions);
+
+			for (uint32_t i = 0; i < extension_count; i++)
+			{
+				VkExtensionProperties extension = extensions[i];
+				if (!strcmp(extension.extensionName, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME))
+				{
+					dynamic_rendering_extension_present = true;
+					continue;
+				}
+			}
+
+			m_tempallocator->deallocate(temp_allocmarker);
+		}
 
 
+		ubo_alignment = physical_device_properties.limits.minUniformBufferOffsetAlignment;
+		ssbo_alignment = physical_device_properties.limits.minStorageBufferOffsetAlignment;
+		
+
+		//Descriptor Indexing
+		VkPhysicalDeviceDescriptorIndexingFeatures indexing_feature{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES, nullptr };
+		VkPhysicalDeviceFeatures2 device_feature2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &indexing_feature};
+		vkGetPhysicalDeviceFeatures2(m_physicalDevice, &device_feature2);
+
+		bindless_support = indexing_feature.descriptorBindingPartiallyBound && indexing_feature.runtimeDescriptorArray;
+
+
+		{
+			temp_allocmarker = m_tempallocator->get_marker();
+
+			//Queue Creation
+			uint32_t queuefamilycount = 0;
+			vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queuefamilycount, nullptr);
+			VkQueueFamilyProperties* queuefamily_properties = (VkQueueFamilyProperties*)
+				m_tempallocator->allocate(sizeof(VkQueueFamilyProperties) * queuefamilycount, alignof(VkQueueFamilyProperties));
+			vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queuefamilycount, queuefamily_properties);
+
+
+			uint32_t main_family_index = UINT32_MAX, compute_family_index = UINT32_MAX, transfer_family_index = UINT32_MAX;
+
+			for (uint32_t fam_idx = 0; fam_idx < queuefamilycount; fam_idx++)
+			{
+				VkQueueFamilyProperties queue_prop = queuefamily_properties[fam_idx];
+
+				if ( main_family_index == UINT32_MAX && 
+					(queue_prop.queueFlags & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT)) == (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
+				{
+					main_family_index = fam_idx;
+					G_INFO("Main family index  ", main_family_index);
+					continue;
+				}
+
+				if (  (queue_prop.queueFlags & VK_QUEUE_COMPUTE_BIT) &&
+					 !(queue_prop.queueFlags & VK_QUEUE_GRAPHICS_BIT) && 
+					  compute_family_index == UINT32_MAX
+					)
+				{
+					compute_family_index = fam_idx;
+					G_INFO("Compute family index  ", compute_family_index);
+					continue;
+				}
+
+				if (
+					(queue_prop.queueFlags & VK_QUEUE_TRANSFER_BIT) &&
+					!(queue_prop.queueFlags & VK_QUEUE_COMPUTE_BIT) &&
+					!(queue_prop.queueFlags & VK_QUEUE_GRAPHICS_BIT) &&
+					transfer_family_index == UINT32_MAX
+					)
+				{
+					transfer_family_index = fam_idx;
+					G_INFO("Transfer family index  ", transfer_family_index);
+					continue;
+				}
+			}
+
+
+			m_tempallocator->deallocate(temp_allocmarker);
+		}
 	}
 }

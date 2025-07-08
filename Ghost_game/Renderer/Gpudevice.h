@@ -44,8 +44,12 @@ namespace g_graphics
 		VkPhysicalDevice   m_physicalDevice;
 		String_Buffer	   m_stringbuffer;
 
+		bool bindless_support = false;
 		bool debug_extension_present = false;
-
+		bool dynamic_rendering_extension_present = false;
+		size_t ubo_alignment	= 256;
+		size_t ssbo_alignment	= 256;
+		
 
 		uint32_t vulkan_main_queue_family;
 		VkDebugUtilsMessengerEXT vulkan_debug_utils_messenger;
