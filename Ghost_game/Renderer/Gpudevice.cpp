@@ -31,15 +31,30 @@ namespace g_graphics
 
 	bool GpuDevice::get_family_queue(VkPhysicalDevice physicalDevice)
 	{
-		uint32_t queuepropsCount;
+		uint32_t queuepropsCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queuepropsCount, nullptr);
 		G_INFO("count of queue props ", queuepropsCount);
 		VkQueueFamilyProperties* queue_family_properties = (VkQueueFamilyProperties*)
 			m_tempallocator->allocate(sizeof(VkQueueFamilyProperties) * queuepropsCount, alignof(VkQueueFamilyProperties));
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queuepropsCount, queue_family_properties);
 
+		VkBool32 is_Supported = VK_FALSE;
+		for (uint32_t i = 0; i < queuepropsCount; i++)
+		{
+			VkQueueFamilyProperties queue_prop = queue_family_properties[i];
 
+			if (queue_prop.queueCount > 0 && queue_prop.queueFlags & (VK_QUEUE_COMPUTE_BIT | VK_QUEUE_GRAPHICS_BIT) )
+			{
+				vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, m_surface, &is_Supported);
+				if (is_Supported)
+				{
+					vulkan_main_queue_family = i;
+					break;
+				}
+			}
+		}
 
+		return is_Supported;
 
 	}
 
@@ -48,6 +63,7 @@ namespace g_graphics
 	{
 		m_tempallocator = device_creation->m_tempallocator;
 		m_allocator		= device_creation->m_allocator;
+		m_windows       = device_creation->m_windows;
 		//m_stringbuffer.init(m_allocator, 1024 * 1024);
 
 
@@ -101,6 +117,14 @@ namespace g_graphics
 			}
 		}
 
+		//Windows Surface
+		VkWin32SurfaceCreateInfoKHR win32_surface{};
+		win32_surface.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+		win32_surface.hinstance = m_windows->m_hinstance;
+		win32_surface.hwnd = m_windows->m_window;
+		
+		VK_CHECK_RESULT(vkCreateWin32SurfaceKHR(m_instance, &win32_surface, nullptr, &m_surface));
+
 		//Finiding physical device
 		{
 			uint32_t physicalDevice_count;
@@ -108,6 +132,8 @@ namespace g_graphics
 			VkPhysicalDevice* physicalDevices = (VkPhysicalDevice*)m_tempallocator->allocate(sizeof(VkPhysicalDevice) * physicalDevice_count, alignof(VkPhysicalDevice));
 			vkEnumeratePhysicalDevices(m_instance, &physicalDevice_count, physicalDevices);
 
+			VkPhysicalDevice discreteGPU = VK_NULL_HANDLE;
+			VkPhysicalDevice integratedGPU = VK_NULL_HANDLE;
 
 			for (int i = 0; i < physicalDevice_count; i++)
 			{
@@ -118,7 +144,8 @@ namespace g_graphics
 				if (physical_device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
 					if (get_family_queue(physicaldev))
 					{
-
+						discreteGPU = physicaldev;
+						break;
 					}
 
 					continue;
@@ -128,7 +155,7 @@ namespace g_graphics
 				{
 					if (get_family_queue(physicaldev))
 					{
-
+						integratedGPU = physicaldev;
 					}
 
 					continue;
@@ -136,7 +163,19 @@ namespace g_graphics
 
 			}
 
+			if (discreteGPU){
+				m_physicalDevice = discreteGPU;
+			}else if (integratedGPU){
+				m_physicalDevice = integratedGPU;
+			}else{
+				G_ASSERT(false, "Suitable GPU Device not Found");
+			}
+			G_INFO("Selected Device Name : ", physical_device_properties.deviceName);
+
 		}
+
+		m_tempallocator->deallocate(temp_allocmarker);
+
 
 
 	}

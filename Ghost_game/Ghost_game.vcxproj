@@ -142,6 +142,7 @@
     <ClCompile Include="base\String.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Renderer\Gpudevice.cpp" />
+    <ClCompile Include="Renderer\g_win.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Scene\Level.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="base\Resource.h" />
     <ClInclude Include="base\String.h" />
     <ClInclude Include="Renderer\Gpudevice.h" />
+    <ClInclude Include="Renderer\g_win.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Scene\Level.h" />
     <ClInclude Include="Scene\Scene.h" />
