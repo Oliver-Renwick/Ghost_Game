@@ -43,7 +43,7 @@ namespace g_graphics
 		for (uint32_t i = 0; i < queuepropsCount; i++)
 		{
 			VkQueueFamilyProperties queue_prop = queue_family_properties[i];
-			
+			G_INFO("Number of queue in this family  ", i, " is : ", queue_prop.queueCount);
 			if (queue_prop.queueCount > 0 && queue_prop.queueFlags & (VK_QUEUE_COMPUTE_BIT | VK_QUEUE_GRAPHICS_BIT) )
 			{
 				vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, m_surface, &is_Supported);
@@ -257,9 +257,82 @@ namespace g_graphics
 					continue;
 				}
 			}
-
-
 			m_tempallocator->deallocate(temp_allocmarker);
+
+
+			vulkan_main_queue_family = main_family_index;
+			vulkan_compute_queue_family = compute_family_index;
+			vulkan_transfer_queue_family = transfer_family_index;
 		}
+
+
+		temp_allocmarker = m_tempallocator->get_marker();
+		// Device Extension Creation
+
+		Array<const char*> device_extension;
+		device_extension.Init(m_tempallocator, 2);
+		device_extension.push(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+		device_extension.push(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME);
+
+		if (dynamic_rendering_extension_present)
+		{
+			device_extension.push(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
+		}
+
+		//Queue Creation
+		uint32_t queue_count = 0;
+		uint32_t queue_indexes[] = { vulkan_main_queue_family, vulkan_compute_queue_family, vulkan_transfer_queue_family };
+		VkDeviceQueueCreateInfo queue_infos[3] = {};
+		const float queue_priority[] = { 1.0f, 1.0f };
+
+		for (int i = 0; i < 3; i++)
+		{
+			VkDeviceQueueCreateInfo& queue_info = queue_infos[queue_count++];
+			queue_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queue_info.queueCount = 1;
+			queue_info.pQueuePriorities = queue_priority;
+			queue_info.queueFamilyIndex = queue_indexes[i];
+		}
+
+
+		//Device Feature
+		VkPhysicalDeviceFeatures2 device_feature{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+		VkPhysicalDeviceVulkan11Features vulkan_feature11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES };
+
+		void* current_pnext = &vulkan_feature11;
+
+		VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamic_rendering_features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR };
+		
+		if (dynamic_rendering_extension_present)
+		{
+			dynamic_rendering_features.pNext = current_pnext;
+			current_pnext = &dynamic_rendering_features;
+		}
+
+		if (bindless_support)
+		{
+			indexing_feature.pNext = current_pnext;
+			current_pnext = &indexing_feature;
+		}
+
+		device_feature.pNext = current_pnext;
+		vkGetPhysicalDeviceFeatures2(m_physicalDevice, &device_feature);
+
+		G_ASSERT(vulkan_feature11.shaderDrawParameters == VK_TRUE, "Shader Draw Parameter is not available");
+
+
+
+		VkDeviceCreateInfo device_info{};
+		device_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		device_info.queueCreateInfoCount = queue_count;
+		device_info.pQueueCreateInfos = queue_infos;
+		device_info.enabledExtensionCount = device_extension.m_size;
+		device_info.ppEnabledExtensionNames = device_extension.m_data;
+		device_info.pNext = &device_feature;
+
+
+		VK_CHECK_RESULT(vkCreateDevice(m_physicalDevice, &device_info, nullptr, &m_device));
+
+
 	}
 }

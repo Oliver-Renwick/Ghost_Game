@@ -42,18 +42,23 @@ namespace g_graphics
 		VkInstance		   m_instance;
 		VkSurfaceKHR       m_surface;
 		VkPhysicalDevice   m_physicalDevice;
+		VkDevice		   m_device;
 		String_Buffer	   m_stringbuffer;
 
-		bool bindless_support = false;
-		bool debug_extension_present = false;
-		bool dynamic_rendering_extension_present = false;
 		size_t ubo_alignment	= 256;
 		size_t ssbo_alignment	= 256;
 		
 
 		uint32_t vulkan_main_queue_family;
+		uint32_t vulkan_compute_queue_family;
+		uint32_t vulkan_transfer_queue_family;
 		VkDebugUtilsMessengerEXT vulkan_debug_utils_messenger;
 		VkPhysicalDeviceProperties physical_device_properties;
+		bool dynamic_rendering_extension_present = false;
+		bool debug_extension_present = false;
+		bool bindless_support = false;
+
+
 		void Init(DeviceCreation* device_creation);
 		bool get_family_queue(VkPhysicalDevice physicalDevice);
 	};
