@@ -43,11 +43,18 @@ namespace g_graphics
 		VkSurfaceKHR       m_surface;
 		VkPhysicalDevice   m_physicalDevice;
 		VkDevice		   m_device;
+		VkQueue			   m_mainQueue;
+		VkQueue			   m_computeQueue;
+		VkQueue			   m_transferQueue;
 		String_Buffer	   m_stringbuffer;
 
 		size_t ubo_alignment	= 256;
 		size_t ssbo_alignment	= 256;
 		
+		//Extension Function
+		PFN_vkCmdBeginRenderingKHR      cmd_begin_rendering;
+		PFN_vkCmdEndRenderingKHR        cmd_end_rendering;
+		PFN_vkQueueSubmit2KHR           queue_submit2;
 
 		uint32_t vulkan_main_queue_family;
 		uint32_t vulkan_compute_queue_family;

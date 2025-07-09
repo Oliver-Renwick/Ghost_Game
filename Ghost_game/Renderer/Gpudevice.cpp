@@ -334,5 +334,17 @@ namespace g_graphics
 		VK_CHECK_RESULT(vkCreateDevice(m_physicalDevice, &device_info, nullptr, &m_device));
 
 
+		if (dynamic_rendering_extension_present)
+		{
+			cmd_begin_rendering = (PFN_vkCmdBeginRenderingKHR)vkGetDeviceProcAddr(m_device, "vkCmdBeginRenderingKHR");
+			cmd_end_rendering = (PFN_vkCmdEndRenderingKHR)vkGetDeviceProcAddr(m_device, "vkCmdEndRenderingKHR");
+		}
+
+		//Get Queue
+		vkGetDeviceQueue(m_device, vulkan_main_queue_family,        0, &m_mainQueue);
+		vkGetDeviceQueue(m_device, vulkan_compute_queue_family,     0, &m_computeQueue);
+		vkGetDeviceQueue(m_device, vulkan_transfer_queue_family,    0, &m_transferQueue);
+
+		m_tempallocator->deallocate(temp_allocmarker);
 	}
 }
